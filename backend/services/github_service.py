@@ -86,6 +86,62 @@ def get_user_stats(username: str):
         
     return stats
 
+def get_pinned_repos(username: str):
+    token = os.getenv("GITHUB_TOKEN")
+    if not token:
+        return []
+    
+    query = """
+    query($login: String!) {
+      user(login: $login) {
+        pinnedItems(first: 6, types: REPOSITORY) {
+          nodes {
+            ... on Repository {
+              name
+              description
+              stargazerCount
+              primaryLanguage {
+                name
+              }
+              url
+            }
+          }
+        }
+      }
+    }
+    """
+    
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json"
+    }
+    try:
+        response = requests.post(
+            "https://api.github.com/graphql",
+            json={"query": query, "variables": {"login": username}},
+            headers=headers,
+            timeout=10
+        )
+        if response.status_code == 200:
+            data = response.json()
+            nodes = data.get("data", {}).get("user", {}).get("pinnedItems", {}).get("nodes", [])
+            if not nodes:
+                return []
+            
+            pinned = []
+            for node in nodes:
+                pinned.append({
+                    "name": node.get("name"),
+                    "description": node.get("description"),
+                    "stargazers_count": node.get("stargazerCount", 0),
+                    "language": node.get("primaryLanguage", {}).get("name") if node.get("primaryLanguage") else None,
+                    "html_url": node.get("url")
+                })
+            return pinned
+    except Exception as e:
+        print("Failed to fetch pinned repos:", e)
+    return []
+
 def parse_usernames(raw_input: str):
     # Split by comma, whitespace, or newline
     entries = re.split(r'[,\s\n]+', raw_input)

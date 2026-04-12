@@ -16,7 +16,10 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { PolarArea, Radar } from 'react-chartjs-2';
+import { PolarArea } from 'react-chartjs-2';
+import ProductivityScore from './components/ProductivityScore';
+import TechDNA from './components/TechDNA';
+import ExportPanel from './components/ExportPanel';
 
 ChartJS.register(
   RadialLinearScale,
@@ -210,7 +213,18 @@ function App() {
 
 function ProfileDashboard({ result, index }) {
   const [hoveredTech, setHoveredTech] = useState(null);
-  const { user, ml_technical_analysis, domain_consistency, stats, organizations, top_repos, top_technical_preferences, productivity_metrics } = result;
+  const [exportConfig, setExportConfig] = useState({
+    header: true,
+    stats: true,
+    affiliations: true,
+    activity: true,
+    pinned: true,
+    dnaMetrics: true,
+    dnaChart: true,
+    productivity: true
+  });
+  
+  const { user, ml_technical_analysis, domain_consistency, stats, organizations, top_repos, pinned_repos, top_technical_preferences, productivity_metrics } = result;
 
   // Process exact repo languages to build tech stack
   let techDict = top_technical_preferences || {};
@@ -295,261 +309,100 @@ function ProfileDashboard({ result, index }) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.15, duration: 0.5 }}
-      className="glass"
-      style={{ padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)' }}
+      style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}
     >
+      <div 
+        id={`dashboard-export-${index}`}
+        className="glass"
+        style={{ padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', transition: 'background-color 0.2s', backgroundColor: 'var(--background)' }}
+      >
       {/* Dashboard Header */}
-      <div style={{ background: 'rgba(255,255,255,0.02)', padding: '2.5rem', borderBottom: '1px solid var(--card-border)' }}>
-        <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap', alignItems: 'start' }}>
-          <motion.img 
-            initial={{ scale: 0.8 }} animate={{ scale: 1 }}
-            src={user.avatar_url} 
-            style={{ width: '120px', height: '120px', borderRadius: '1.5rem', border: '3px solid var(--primary)', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.2)' }}
-          />
-          <div style={{ flex: 1, minWidth: '300px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
-              <div>
-                <h2 style={{ fontSize: '2.25rem', marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>{user.name || user.login}</h2>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                  <a href={user.html_url} target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    @{user.login} <ExternalLink size={14} />
-                  </a>
-                  {user.location && <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Globe size={14} /> {user.location}</span>}
-                  {user.company && <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Building2 size={14} /> {user.company}</span>}
+      {exportConfig.header && (
+        <div style={{ background: 'rgba(255,255,255,0.02)', padding: '2.5rem', borderBottom: '1px solid var(--card-border)' }}>
+          <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap', alignItems: 'start' }}>
+            <motion.img 
+              initial={{ scale: 0.8 }} animate={{ scale: 1 }}
+              src={user.avatar_url} 
+              style={{ width: '120px', height: '120px', borderRadius: '1.5rem', border: '3px solid var(--primary)', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.2)' }}
+            />
+            <div style={{ flex: 1, minWidth: '300px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+                <div>
+                  <h2 style={{ fontSize: '2.25rem', marginBottom: '0.25rem', letterSpacing: '-0.02em' }}>{user.name || user.login}</h2>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    <a href={user.html_url} target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      @{user.login} <ExternalLink size={14} />
+                    </a>
+                    {user.location && <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Globe size={14} /> {user.location}</span>}
+                    {user.company && <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Building2 size={14} /> {user.company}</span>}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <span style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary)', lineHeight: 1 }}>{ml_technical_analysis.interest_score}</span>
+                  <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.25rem' }}>Interest Score</div>
                 </div>
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <span style={{ fontSize: '2.5rem', fontWeight: 900, color: 'var(--primary)', lineHeight: 1 }}>{ml_technical_analysis.interest_score}</span>
-                <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: '0.25rem' }}>Interest Score</div>
-              </div>
-            </div>
-            <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '800px' }}>
-              {user.bio || 'This investigator maintains a low profile with no biography.'}
-            </p>
-            
-            {/* Social Links */}
-            <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem' }}>
-              {user.twitter_username && <a href={`https://twitter.com/${user.twitter_username}`} style={{ color: '#64748b' }}><TwitterLogo size={20} /></a>}
-              {user.blog && <a href={user.blog.startsWith('http') ? user.blog : `https://${user.blog}`} style={{ color: '#64748b' }}><Globe size={20} /></a>}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Quickbar */}
-      <div style={{ padding: '2rem 2.5rem' }}>
-        <div className="stats-grid">
-          <div className="stat-item">
-            <Layers className="text-primary" size={20} style={{ marginBottom: '0.5rem' }} />
-            <span className="stat-value">{user.public_repos}</span>
-            <span className="stat-label">Public Repos</span>
-          </div>
-          <div className="stat-item">
-            <GitMerge style={{ color: '#4ade80', marginBottom: '0.5rem' }} size={20} />
-            <span className="stat-value">{stats?.total_prs || 0}</span>
-            <span className="stat-label">Pull Requests</span>
-          </div>
-          <div className="stat-item">
-            <MessageSquare style={{ color: '#f472b6', marginBottom: '0.5rem' }} size={20} />
-            <span className="stat-value">{stats?.total_issues || 0}</span>
-            <span className="stat-label">Issues</span>
-          </div>
-          <div className="stat-item">
-            <Users style={{ color: '#818cf8', marginBottom: '0.5rem' }} size={20} />
-            <span className="stat-value">{user.followers}</span>
-            <span className="stat-label">Followers</span>
-          </div>
-        </div>
-
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: '3rem', flexWrap: 'wrap' }}>
-          <div>
-            {/* Frameworks & Tech Stack */}
-            <h4 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-              <Rocket size={18} className="text-secondary" /> Developer DNA Profile
-            </h4>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
-              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
-                <div style={{ fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', fontWeight: 600 }}>
-                  Top 3 Languages
-                </div>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
-                  {topTechs.slice(0, 3).map(tech => (
-                    <div 
-                      key={tech._actualName} 
-                      className="glass tech-pill" 
-                      onMouseEnter={() => setHoveredTech(tech._actualName)}
-                      onMouseLeave={() => setHoveredTech(null)}
-                      style={{ 
-                        padding: '0.5rem 0.75rem', 
-                        fontSize: '0.9rem', 
-                        fontWeight: 600, 
-                        color: 'var(--text-primary)', 
-                        border: `1px solid ${tech.color}40`,
-                        boxShadow: `0 0 10px ${tech.color}15`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem',
-                        background: hoveredTech === tech._actualName ? `${tech.color}15` : 'rgba(255,255,255,0.02)',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        transition: 'all 0.3s ease',
-                        cursor: 'default'
-                      }}
-                    >
-                      {/* Progress Background */}
-                      <div style={{ position: 'absolute', bottom: 0, left: 0, height: '3px', background: tech.color, width: `${tech.proficiency}%`, opacity: 0.8, transition: 'width 1s ease-out' }}></div>
-                      
-                      <i className={tech.class} style={{ fontSize: '1.2rem', color: tech.color }}></i>
-                      {/* Show the original tech abbreviation if it didn't match cleanly, to avoid hiding it completely */}
-                      {tech.name === "0" || tech.name === "1" || tech.name === "2" ? tech._actualName : tech.name}
-                      
-                      {/* Hover Tooltip */}
-                      <AnimatePresence>
-                        {hoveredTech === tech._actualName && (
-                          <motion.div 
-                            initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
-                            style={{
-                              position: 'absolute',
-                              bottom: 'calc(100% + 5px)',
-                              left: '50%',
-                              transform: 'translateX(-50%)',
-                              background: '#0f172a',
-                              border: '1px solid #334155',
-                              padding: '0.5rem',
-                              borderRadius: '0.5rem',
-                              fontSize: '0.75rem',
-                              color: '#e2e8f0',
-                              whiteSpace: 'nowrap',
-                              zIndex: 10,
-                              boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
-                            }}
-                          >
-                            Found in <strong style={{ color: tech.color }}>{tech.repoCount}</strong> repos
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '800px' }}>
+                {user.bio || 'This investigator maintains a low profile with no biography.'}
+              </p>
               
-              {topTechs.length === 0 && (
-                <div style={{ color: '#64748b', fontSize: '0.9rem', fontStyle: 'italic' }}>No prominent tech stack detected.</div>
-              )}
-            </div>
-
-            {/* Organizations */}
-            {(organizations || []).length > 0 && (
-              <div style={{ marginBottom: '2.5rem' }}>
-                <h4 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-                  <Building2 size={18} className="text-primary" /> Affiliations
-                </h4>
-                <div className="org-list">
-                  {(organizations || []).map(org => (
-                    <div key={org.login} className="org-badge">
-                      <img src={org.avatar_url} alt={org.login} className="org-logo" />
-                      <span>{org.login}</span>
-                    </div>
-                  ))}
-                </div>
+              <div style={{ display: 'flex', gap: '1.5rem', marginTop: '1.5rem' }}>
+                {user.twitter_username && <a href={`https://twitter.com/${user.twitter_username}`} style={{ color: '#64748b' }}><TwitterLogo size={20} /></a>}
+                {user.blog && <a href={user.blog.startsWith('http') ? user.blog : `https://${user.blog}`} style={{ color: '#64748b' }}><Globe size={20} /></a>}
               </div>
-            )}
-
-            {/* Recent Activity Repos */}
-            {(top_repos || []).length > 0 && (
-              <>
-                <h4 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-                  <Zap size={18} style={{ color: '#38bdf8' }} /> Recent Activity
-                </h4>
-                <div className="repo-grid">
-                  {(top_repos || []).map(repo => (
-                    <div key={repo.name} className="repo-card">
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                          <h5 style={{ fontSize: '1.05rem', margin: 0, fontWeight: 700 }}>{repo.name}</h5>
-                        </div>
-                        <p className="repo-description">
-                          {repo.description || 'No description provided.'}
-                        </p>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                        <span style={{ fontSize: '0.8rem', fontWeight: 800, color: 'var(--primary)', letterSpacing: '0.05em' }}>{repo.language || 'Code'}</span>
-                        <a href={repo.html_url} target="_blank" style={{ color: '#64748b', transition: 'color 0.2s' }} onMouseOver={e => e.currentTarget.style.color = '#38bdf8'} onMouseOut={e => e.currentTarget.style.color = '#64748b'}>
-                          <ExternalLink size={18} />
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <div style={{ textAlign: 'center' }}>
-            <h4 style={{ marginBottom: '1.5rem', color: '#94a3b8', fontSize: '1rem' }}>Technical DNA</h4>
-            <div style={{ width: '100%', height: '380px', display: 'flex', justifyContent: 'center' }}>
-              <PolarArea data={polarData} options={polarOptions} />
             </div>
           </div>
         </div>
+      )}
 
-        {/* Detailed Insights - Always Visible */}
-        <div style={{ marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2.5rem' }}>
-          
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
-              <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.5rem', color: '#fff' }}>
-                <Activity size={24} color="#38bdf8" /> Developer Productivity Score
-              </h4>
-              <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '2px solid #38bdf8', padding: '0.5rem 1.5rem', borderRadius: '2rem', color: '#38bdf8', fontWeight: 900, fontSize: '1.5rem' }}>
-                  {productivity_metrics?.productivity_score || 0}<span style={{fontSize: '1rem', color: 'rgba(56, 189, 248, 0.6)'}}>/100</span>
-              </div>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
-            {/* Commits & Frequency */}
-            <div className="glass" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Commit Frequency</span>
-                  <span style={{ color: '#4ade80', fontWeight: 800 }}>{productivity_metrics?.commit_frequency_score || 0} pts</span>
-              </div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>{productivity_metrics?.commits_per_week || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>/week</span></div>
-              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>{productivity_metrics?.total_commits_90d || 0} total commits found</div>
+      {/* Main Content Area */}
+      <div style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+        
+        {exportConfig.stats && (
+          <div className="stats-grid">
+            <div className="stat-item">
+              <Layers className="text-primary" size={20} style={{ marginBottom: '0.5rem' }} />
+              <span className="stat-value">{user.public_repos}</span>
+              <span className="stat-label">Public Repos</span>
             </div>
-
-            {/* Consistency & Streaks */}
-            <div className="glass" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Consistency</span>
-                  <span style={{ color: '#facc15', fontWeight: 800 }}>{productivity_metrics?.consistency_score || 0} pts</span>
-              </div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>{productivity_metrics?.max_streak || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>days max streak</span></div>
-              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>Active on {productivity_metrics?.active_days || 0} unique days</div>
+            <div className="stat-item">
+              <GitMerge style={{ color: '#4ade80', marginBottom: '0.5rem' }} size={20} />
+              <span className="stat-value">{stats?.total_prs || 0}</span>
+              <span className="stat-label">Pull Requests</span>
             </div>
-
-            {/* PR Efficiency */}
-            <div className="glass" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>PR Efficiency</span>
-                  <span style={{ color: '#f472b6', fontWeight: 800 }}>{productivity_metrics?.pr_efficiency_score || 0} pts</span>
-              </div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>+{stats?.total_prs || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>PRs</span></div>
-              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>Merge Rate & Efficiency tracking</div>
+            <div className="stat-item">
+              <MessageSquare style={{ color: '#f472b6', marginBottom: '0.5rem' }} size={20} />
+              <span className="stat-value">{stats?.total_issues || 0}</span>
+              <span className="stat-label">Issues</span>
             </div>
-
-            {/* Impact */}
-            <div className="glass" style={{ padding: '1.5rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Code Impact</span>
-                  <span style={{ color: '#a855f7', fontWeight: 800 }}>{productivity_metrics?.impact_score || 0} pts</span>
-              </div>
-              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>{stats?.total_stars || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>stars gained</span></div>
-              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>Total reach via forks and stars</div>
+            <div className="stat-item">
+              <Users style={{ color: '#818cf8', marginBottom: '0.5rem' }} size={20} />
+              <span className="stat-value">{user.followers}</span>
+              <span className="stat-label">Followers</span>
             </div>
           </div>
+        )}
 
-        </div>
+        <TechDNA 
+          topTechs={topTechs} 
+          polarData={polarData} 
+          polarOptions={polarOptions} 
+          organizations={organizations} 
+          top_repos={top_repos} 
+          pinned_repos={pinned_repos}
+          config={exportConfig} 
+        />
+        
+        {exportConfig.productivity && <ProductivityScore metrics={productivity_metrics} stats={stats} />}
       </div>
+      </div>
+      {/* End Dashboard Export Capture Area */}
+
+      <ExportPanel 
+        dashboardId={`dashboard-export-${index}`} 
+        exportConfig={exportConfig} 
+        setExportConfig={setExportConfig} 
+      />
     </motion.div>
   );
 }

@@ -79,7 +79,7 @@ async def analyze_profiles(request: AnalyzeRequest):
             
             top_repos_list = sorted(repos, key=lambda x: x.get('pushed_at', ''), reverse=True)[:3]
             
-            from services.github_service import get_repo_commits
+            from services.github_service import get_repo_commits, get_pinned_repos
             deep_commits = []
             for tr in top_repos_list:
                 deep_commits.extend(get_repo_commits(tr['owner']['login'], tr['name'], author=username))
@@ -87,12 +87,15 @@ async def analyze_profiles(request: AnalyzeRequest):
             from services.analysis_service import calculate_deep_productivity_metrics
             productivity_metrics = calculate_deep_productivity_metrics(deep_commits, repos, detailed_stats)
             
+            pinned_repos = get_pinned_repos(username)
+            
             combined_data = {
                 "user": user_data,
                 "repos_count": len(repos),
                 "organizations": orgs,
                 "stats": detailed_stats,
                 "top_repos": sorted(repos, key=lambda x: x.get('pushed_at', ''), reverse=True)[:4],
+                "pinned_repos": pinned_repos,
                 "recent_events": events[:5],
                 "top_technical_preferences": top_languages,
                 "ml_technical_analysis": ml_analysis,
