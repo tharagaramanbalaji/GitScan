@@ -3,7 +3,7 @@ import axios from 'axios';
 import { 
   Loader2, Search, AlertCircle, CheckCircle2, TrendingUp, Code2, 
   Rocket, Zap, ChevronDown, ChevronUp, Star, GitMerge, MessageSquare, 
-  Globe, Building2, Users, Layers, ExternalLink
+  Globe, Building2, Users, Layers, ExternalLink, Activity
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -11,16 +11,18 @@ import {
   RadialLinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Filler,
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Radar } from 'react-chartjs-2';
+import { PolarArea, Radar } from 'react-chartjs-2';
 
 ChartJS.register(
   RadialLinearScale,
   PointElement,
   LineElement,
+  ArcElement,
   Filler,
   Tooltip,
   Legend
@@ -38,6 +40,58 @@ const TwitterLogo = ({ size = 24, color = "currentColor" }) => (
     <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
   </svg>
 );
+
+const TECH_MAP = {
+  javascript: { class: 'devicon-javascript-plain', color: '#facc15', category: 'Language' },
+  python: { class: 'devicon-python-plain', color: '#38bdf8', category: 'Language' },
+  java: { class: 'devicon-java-plain', color: '#f87171', category: 'Language' },
+  typescript: { class: 'devicon-typescript-plain', color: '#60a5fa', category: 'Language' },
+  c: { class: 'devicon-c-plain', color: '#9ca3af', category: 'Language' },
+  'c++': { class: 'devicon-cplusplus-plain', color: '#60a5fa', category: 'Language' },
+  csharp: { class: 'devicon-csharp-plain', color: '#10b981', category: 'Language' },
+  go: { class: 'devicon-go-plain', color: '#06b6d4', category: 'Language' },
+  rust: { class: 'devicon-rust-plain', color: '#f97316', category: 'Language' },
+  ruby: { class: 'devicon-ruby-plain', color: '#ef4444', category: 'Language' },
+  php: { class: 'devicon-php-plain', color: '#818cf8', category: 'Language' },
+  swift: { class: 'devicon-swift-plain', color: '#fb923c', category: 'Language' },
+  react: { class: 'devicon-react-original', color: '#38bdf8', category: 'Framework' },
+  vue: { class: 'devicon-vuejs-plain', color: '#4ade80', category: 'Framework' },
+  angular: { class: 'devicon-angularjs-plain', color: '#ef4444', category: 'Framework' },
+  'node.js': { class: 'devicon-nodejs-plain', color: '#4ade80', category: 'Framework' },
+  express: { class: 'devicon-express-original', color: '#9ca3af', category: 'Framework' },
+  django: { class: 'devicon-django-plain', color: '#10b981', category: 'Framework' },
+  flask: { class: 'devicon-flask-original', color: '#cbd5e1', category: 'Framework' },
+  spring: { class: 'devicon-spring-plain', color: '#4ade80', category: 'Framework' },
+  laravel: { class: 'devicon-laravel-plain', color: '#ef4444', category: 'Framework' },
+  docker: { class: 'devicon-docker-plain', color: '#38bdf8', category: 'DevOps' },
+  kubernetes: { class: 'devicon-kubernetes-plain', color: '#60a5fa', category: 'DevOps' },
+  aws: { class: 'devicon-amazonwebservices-original', color: '#f59e0b', category: 'DevOps' },
+  azure: { class: 'devicon-azure-plain', color: '#38bdf8', category: 'DevOps' },
+  linux: { class: 'devicon-linux-plain', color: '#fbbf24', category: 'DevOps' },
+  mysql: { class: 'devicon-mysql-plain', color: '#f59e0b', category: 'Database' },
+  postgresql: { class: 'devicon-postgresql-plain', color: '#60a5fa', category: 'Database' },
+  mongodb: { class: 'devicon-mongodb-plain', color: '#4ade80', category: 'Database' },
+  redis: { class: 'devicon-redis-plain', color: '#ef4444', category: 'Database' },
+  html: { class: 'devicon-html5-plain', color: '#f97316', category: 'Language' },
+  css: { class: 'devicon-css3-plain', color: '#38bdf8', category: 'Language' },
+};
+
+const getTechDetails = (techName) => {
+  const normalized = techName.toLowerCase().replace(/\s+/g, '');
+  
+  // Exact match
+  if (TECH_MAP[normalized]) return { ...TECH_MAP[normalized], name: techName };
+  if (TECH_MAP[techName.toLowerCase()]) return { ...TECH_MAP[techName.toLowerCase()], name: techName };
+  
+  // Stricter partial matches to avoid 'c' matching 'chat'
+  for (const [key, val] of Object.entries(TECH_MAP)) {
+    if (key.length >= 3 && normalized.includes(key)) {
+      return { ...val, name: techName };
+    }
+  }
+  
+  return { class: 'devicon-github-original', color: '#cbd5e1', category: 'Other', name: techName };
+};
 
 const API_BASE_URL = 'http://localhost:8000';
 
@@ -155,37 +209,85 @@ function App() {
 }
 
 function ProfileDashboard({ result, index }) {
-  const [expanded, setExpanded] = useState(false);
-  const { user, ml_technical_analysis, domain_consistency, stats, organizations, top_repos } = result;
+  const [hoveredTech, setHoveredTech] = useState(null);
+  const { user, ml_technical_analysis, domain_consistency, stats, organizations, top_repos, top_technical_preferences, productivity_metrics } = result;
 
-  const radarData = {
+  // Process exact repo languages to build tech stack
+  let techDict = top_technical_preferences || {};
+  if (Array.isArray(top_technical_preferences)) {
+     // Safeguard for old cached JSONs
+     techDict = top_technical_preferences.reduce((a, v) => ({ ...a, [v]: 5 }), {});
+  }
+  const techEntries = Object.entries(techDict).sort((a, b) => b[1] - a[1]);
+  const maxRepoCount = techEntries.length > 0 ? techEntries[0][1] : 1;
+
+  // Only take Top Languages and don't categorize
+  const topTechs = techEntries.slice(0, 5).map(([tech, count]) => {
+    const details = getTechDetails(tech);
+    const proficiency = Math.max(10, Math.round((count / maxRepoCount) * 100));
+    return { ...details, proficiency, repoCount: count, _actualName: tech };
+  });
+
+  const baseColors = [
+    'rgba(56, 189, 248, 0.75)',  // Sky blue
+    'rgba(167, 139, 250, 0.75)', // Purple
+    'rgba(244, 114, 182, 0.75)', // Pink
+    'rgba(52, 211, 153, 0.75)',  // Emerald
+    'rgba(251, 191, 36, 0.75)',  // Amber
+    'rgba(248, 113, 113, 0.75)', // Red
+    'rgba(129, 140, 248, 0.75)', // Indigo
+  ];
+
+  const polarData = {
     labels: Object.keys(domain_consistency.consistency_scores),
     datasets: [
       {
-        label: 'Proficiency',
+        label: 'Proficiency Score',
         data: Object.values(domain_consistency.consistency_scores),
-        backgroundColor: 'rgba(56, 189, 248, 0.25)',
-        borderColor: '#38bdf8',
+        backgroundColor: baseColors.slice(0, Object.keys(domain_consistency.consistency_scores).length),
+        borderColor: 'rgba(15, 23, 42, 0.8)',
         borderWidth: 2,
-        pointBackgroundColor: '#38bdf8',
-        pointBorderColor: '#fff',
-        pointHoverRadius: 5,
+        hoverBorderColor: '#ffffff',
       },
     ],
   };
 
-  const radarOptions = {
+  const polarOptions = {
+    maintainAspectRatio: false,
+    layout: { padding: 10 },
     scales: {
       r: {
-        angleLines: { color: 'rgba(255, 255, 255, 0.08)' },
-        grid: { color: 'rgba(255, 255, 255, 0.08)' },
-        pointLabels: { color: '#94a3b8', font: { size: 10, weight: 600 } },
-        ticks: { display: false },
-        suggestedMin: 0,
-        suggestedMax: 100
+        angleLines: { color: 'rgba(255, 255, 255, 0.05)', lineWidth: 1 },
+        grid: { color: 'rgba(255, 255, 255, 0.05)', circular: true },
+        ticks: { display: false, maxTicksLimit: 5 },
+        min: -20,
       }
     },
-    plugins: { legend: { display: false } }
+    plugins: { 
+      legend: { 
+        display: true,
+        position: 'right',
+        labels: {
+          color: '#cbd5e1',
+          font: { size: 12, weight: '600' },
+          padding: 15,
+          usePointStyle: true,
+          pointStyle: 'circle'
+        }
+      },
+      tooltip: {
+        backgroundColor: 'rgba(15, 23, 42, 0.95)',
+        titleColor: '#fff',
+        bodyColor: '#38bdf8',
+        bodyFont: { weight: 'bold', size: 14 },
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        padding: 12,
+        callbacks: {
+          label: (context) => ` Score: ${context.raw}%`
+        }
+      }
+    }
   };
 
   return (
@@ -263,14 +365,78 @@ function ProfileDashboard({ result, index }) {
           <div>
             {/* Frameworks & Tech Stack */}
             <h4 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
-              <Rocket size={18} className="text-secondary" /> Primary Tech Stack
+              <Rocket size={18} className="text-secondary" /> Developer DNA Profile
             </h4>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '2.5rem' }}>
-              {(ml_technical_analysis.frameworks_tech || []).map(tech => (
-                <span key={tech} className="glass" style={{ padding: '0.5rem 1rem', fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-primary)', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  {tech}
-                </span>
-              ))}
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem' }}>
+              <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.05)' }}>
+                <div style={{ fontSize: '0.8rem', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', fontWeight: 600 }}>
+                  Top 3 Languages
+                </div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  {topTechs.slice(0, 3).map(tech => (
+                    <div 
+                      key={tech._actualName} 
+                      className="glass tech-pill" 
+                      onMouseEnter={() => setHoveredTech(tech._actualName)}
+                      onMouseLeave={() => setHoveredTech(null)}
+                      style={{ 
+                        padding: '0.5rem 0.75rem', 
+                        fontSize: '0.9rem', 
+                        fontWeight: 600, 
+                        color: 'var(--text-primary)', 
+                        border: `1px solid ${tech.color}40`,
+                        boxShadow: `0 0 10px ${tech.color}15`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        background: hoveredTech === tech._actualName ? `${tech.color}15` : 'rgba(255,255,255,0.02)',
+                        position: 'relative',
+                        overflow: 'hidden',
+                        transition: 'all 0.3s ease',
+                        cursor: 'default'
+                      }}
+                    >
+                      {/* Progress Background */}
+                      <div style={{ position: 'absolute', bottom: 0, left: 0, height: '3px', background: tech.color, width: `${tech.proficiency}%`, opacity: 0.8, transition: 'width 1s ease-out' }}></div>
+                      
+                      <i className={tech.class} style={{ fontSize: '1.2rem', color: tech.color }}></i>
+                      {/* Show the original tech abbreviation if it didn't match cleanly, to avoid hiding it completely */}
+                      {tech.name === "0" || tech.name === "1" || tech.name === "2" ? tech._actualName : tech.name}
+                      
+                      {/* Hover Tooltip */}
+                      <AnimatePresence>
+                        {hoveredTech === tech._actualName && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}
+                            style={{
+                              position: 'absolute',
+                              bottom: 'calc(100% + 5px)',
+                              left: '50%',
+                              transform: 'translateX(-50%)',
+                              background: '#0f172a',
+                              border: '1px solid #334155',
+                              padding: '0.5rem',
+                              borderRadius: '0.5rem',
+                              fontSize: '0.75rem',
+                              color: '#e2e8f0',
+                              whiteSpace: 'nowrap',
+                              zIndex: 10,
+                              boxShadow: '0 4px 15px rgba(0,0,0,0.5)'
+                            }}
+                          >
+                            Found in <strong style={{ color: tech.color }}>{tech.repoCount}</strong> repos
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {topTechs.length === 0 && (
+                <div style={{ color: '#64748b', fontSize: '0.9rem', fontStyle: 'italic' }}>No prominent tech stack detected.</div>
+              )}
             </div>
 
             {/* Organizations */}
@@ -322,68 +488,67 @@ function ProfileDashboard({ result, index }) {
 
           <div style={{ textAlign: 'center' }}>
             <h4 style={{ marginBottom: '1.5rem', color: '#94a3b8', fontSize: '1rem' }}>Technical DNA</h4>
-            <div style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center' }}>
-              <Radar data={radarData} options={radarOptions} />
+            <div style={{ width: '100%', height: '380px', display: 'flex', justifyContent: 'center' }}>
+              <PolarArea data={polarData} options={polarOptions} />
             </div>
-            
-            <button 
-              onClick={() => setExpanded(!expanded)}
-              style={{ background: 'rgba(255,255,255,0.05)', color: '#94a3b8', border: '1px solid var(--card-border)', width: '100%', marginTop: '2rem', padding: '0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-            >
-              {expanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              Insights {expanded ? 'Summary' : 'Report'}
-            </button>
           </div>
         </div>
 
-        {/* Detailed Insights Toggleable */}
-        <AnimatePresence>
-          {expanded && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} style={{ overflow: 'hidden' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2.5rem', marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2.5rem' }}>
-                <div>
-                  <h4 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Zap size={20} color="#f472b6" /> Forensic Insights
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {domain_consistency.claimed_domains.map(domain => (
-                      <div key={domain} className="glass" style={{ padding: '1rem', background: 'rgba(74, 222, 128, 0.05)', borderColor: 'rgba(74, 222, 128, 0.2)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <CheckCircle2 size={18} color="#4ade80" />
-                          <span style={{ fontSize: '0.95rem' }}>Claimed <strong>{domain}</strong> expertise: <span style={{ color: '#4ade80' }}>{domain_consistency.consistency_scores[domain]}% Evidence Found</span></span>
-                        </div>
-                      </div>
-                    ))}
-                    {domain_consistency.verified_domains.filter(d => !domain_consistency.claimed_domains.includes(d)).map(domain => (
-                      <div key={domain} className="glass" style={{ padding: '1rem', background: 'rgba(56, 189, 248, 0.05)', borderColor: 'rgba(56, 189, 248, 0.2)' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                          <Rocket size={18} color="#38bdf8" />
-                          <span style={{ fontSize: '0.95rem' }}>Stealth <strong>{domain}</strong> skills detected: <span style={{ color: '#38bdf8' }}>{domain_consistency.consistency_scores[domain]}% Confidence</span></span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <h4 style={{ marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <TrendingUp size={20} color="#fbbf24" /> Optimization Roadmap
-                  </h4>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {domain_consistency.suggestions.length > 0 ? (
-                      domain_consistency.suggestions.map((s, i) => (
-                        <div key={i} className="glass" style={{ padding: '1rem', fontSize: '0.9rem', color: '#cbd5e1', background: 'rgba(251, 191, 36, 0.05)', borderColor: 'rgba(251, 191, 36, 0.1)' }}>
-                          • {s}
-                        </div>
-                      ))
-                    ) : (
-                      <div style={{ color: '#64748b', fontStyle: 'italic' }}>Profile is highly optimized. No critical improvements recommended.</div>
-                    )}
-                  </div>
-                </div>
+        {/* Detailed Insights - Always Visible */}
+        <div style={{ marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2.5rem' }}>
+          
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
+              <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.5rem', color: '#fff' }}>
+                <Activity size={24} color="#38bdf8" /> Developer Productivity Score
+              </h4>
+              <div style={{ background: 'rgba(56, 189, 248, 0.1)', border: '2px solid #38bdf8', padding: '0.5rem 1.5rem', borderRadius: '2rem', color: '#38bdf8', fontWeight: 900, fontSize: '1.5rem' }}>
+                  {productivity_metrics?.productivity_score || 0}<span style={{fontSize: '1rem', color: 'rgba(56, 189, 248, 0.6)'}}>/100</span>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+            {/* Commits & Frequency */}
+            <div className="glass" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Commit Frequency</span>
+                  <span style={{ color: '#4ade80', fontWeight: 800 }}>{productivity_metrics?.commit_frequency_score || 0} pts</span>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>{productivity_metrics?.commits_per_week || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>/week</span></div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>{productivity_metrics?.total_commits_90d || 0} total commits found</div>
+            </div>
+
+            {/* Consistency & Streaks */}
+            <div className="glass" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Consistency</span>
+                  <span style={{ color: '#facc15', fontWeight: 800 }}>{productivity_metrics?.consistency_score || 0} pts</span>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>{productivity_metrics?.max_streak || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>days max streak</span></div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>Active on {productivity_metrics?.active_days || 0} unique days</div>
+            </div>
+
+            {/* PR Efficiency */}
+            <div className="glass" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>PR Efficiency</span>
+                  <span style={{ color: '#f472b6', fontWeight: 800 }}>{productivity_metrics?.pr_efficiency_score || 0} pts</span>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>+{stats?.total_prs || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>PRs</span></div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>Merge Rate & Efficiency tracking</div>
+            </div>
+
+            {/* Impact */}
+            <div className="glass" style={{ padding: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                  <span style={{ color: '#94a3b8', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Code Impact</span>
+                  <span style={{ color: '#a855f7', fontWeight: 800 }}>{productivity_metrics?.impact_score || 0} pts</span>
+              </div>
+              <div style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.25rem' }}>{stats?.total_stars || 0} <span style={{fontSize: '1rem', color: '#94a3b8', fontWeight: 500}}>stars gained</span></div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem' }}>Total reach via forks and stars</div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </motion.div>
   );

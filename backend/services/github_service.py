@@ -27,11 +27,38 @@ def get_user_repos(username: str):
     return []
 
 def get_user_events(username: str):
-    url = f"https://api.github.com/users/{username}/events/public"
+    url = f"https://api.github.com/users/{username}/events/public?per_page=100"
     response = requests.get(url, headers=get_headers())
     if response.status_code == 200:
         return response.json()
     return []
+
+def get_repo_commits(owner: str, repo: str, author: str = None, max_pages=3):
+    commits = []
+    base_url = f"https://api.github.com/repos/{owner}/{repo}/commits?per_page=100"
+    if author:
+        base_url += f"&author={author}"
+        
+    url = base_url
+    for i in range(max_pages):
+        try:
+            response = requests.get(url, headers=get_headers(), timeout=10)
+            if response.status_code == 200:
+                page_commits = response.json()
+                if not isinstance(page_commits, list): break
+                commits.extend(page_commits)
+                if len(page_commits) < 100:
+                    break
+                link = response.headers.get("Link")
+                if not link or 'rel="next"' not in link:
+                    break
+                next_url_match = re.search(r'<([^>]+)>;\s*rel="next"', link)
+                if next_url_match:
+                    url = next_url_match.group(1)
+                else: break
+            else: break
+        except: break
+    return commits
 
 def get_user_organizations(username: str):
     url = f"https://api.github.com/users/{username}/orgs"

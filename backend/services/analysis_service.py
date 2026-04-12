@@ -4,19 +4,18 @@ import numpy as np
 from datetime import datetime, timedelta
 
 def extract_top_languages(repos):
-    """Extract top 3 programming languages from user repositories"""
+    """Extract top programming languages with their counts from user repositories"""
     languages = []
     for repo in repos:
         if repo.get('language') and repo.get('language') != 'null':
             languages.append(repo['language'])
     
     if not languages:
-        return []
+        return {}
     
     language_counts = Counter(languages)
-    top_languages = [lang for lang, count in language_counts.most_common(3)]
-    
-    return top_languages
+    # Return as dict { "Language": count } for all languages
+    return dict(language_counts.most_common(10))
 
 def extract_technical_interests_ml(repos, user_data=None):
     """Use ML to extract technical interests from repository data and user profile"""
@@ -257,3 +256,114 @@ def validate_domain_consistency(bio: str, repos: list, ml_analysis: dict) -> dic
             )
 
     return consistency_report
+
+def calculate_deep_productivity_metrics(deep_commits, repos, stats):
+    from datetime import datetime, timezone
+    
+    if not deep_commits:
+        return {
+           "total_commits_90d": 0, "commits_per_day": 0, "commits_per_week": 0,
+           "active_days": 0, "consistency_score": 0, "peak_hour": 0, "max_streak": 0,
+           "productivity_score": 0, "commit_frequency_score": 0, 
+           "pr_efficiency_score": 0, "impact_score": 0,
+           "insights": ["Not enough public code activity detected recently."]
+        }
+        
+    timestamps = []
+    for c in deep_commits:
+        try:
+            date_str = c['commit']['author']['date']
+            dt = datetime.strptime(date_str, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+            timestamps.append(dt)
+        except: pass
+        
+    timestamps.sort()
+    
+    if not timestamps:
+        return {
+           "total_commits_90d": 0, "commits_per_day": 0, "commits_per_week": 0,
+           "active_days": 0, "consistency_score": 0, "peak_hour": 0, "max_streak": 0,
+           "productivity_score": 0, "commit_frequency_score": 0, 
+           "pr_efficiency_score": 0, "impact_score": 0,
+           "insights": ["No recent commit timestamps found."]
+        }
+        
+    min_date = timestamps[0]
+    max_date = timestamps[-1]
+    total_days = (max_date - min_date).days + 1
+    if total_days <= 0: total_days = 1
+    
+    total_commits = len(timestamps)
+    commits_per_day = total_commits / total_days
+    commits_per_week = total_commits / (total_days / 7)
+    
+    active_days_set = set(t.strftime("%Y-%m-%d") for t in timestamps)
+    active_days = len(active_days_set)
+    consistency_score_raw = (active_days / total_days)
+    consistency_score = consistency_score_raw * 100
+    
+    hours = [0] * 24
+    for t in timestamps:
+        hours[t.hour] += 1
+    peak_hour = hours.index(max(hours)) if max(hours) > 0 else 0
+    
+    insights = []
+    if consistency_score > 30:
+        insights.append("User is highly consistent")
+    else:
+         insights.append("Occasional burst coding sessions")
+         
+    time_of_day = "morning" if 5 <= peak_hour < 12 else "afternoon" if 12 <= peak_hour < 18 else "late night"
+    insights.append(f"Peak coding time is {time_of_day} (~{peak_hour}:00 UTC)")
+    
+    if commits_per_week > 10:
+        insights.append("High engineering throughput")
+    
+    if commits_per_week > 20: freq_score = 100
+    elif commits_per_week > 10: freq_score = 70
+    else: freq_score = 40
+    
+    pr_efficiency_score = 85 
+    
+    total_stars = sum(repo.get('stargazers_count', 0) for repo in repos)
+    total_forks = sum(repo.get('forks_count', 0) for repo in repos)
+    raw_impact = (total_stars * 0.1) + (total_forks * 0.2)
+    impact_score = min(max(raw_impact * 10, 40) if total_commits > 0 else raw_impact, 100)
+    
+    productivity_score = (
+        (freq_score * 0.25) +
+        (min(consistency_score, 100) * 0.25) +
+        (pr_efficiency_score * 0.25) +
+        (impact_score * 0.25)
+    )
+
+    streak = 0
+    max_streak = 0
+    sorted_days = sorted(list(active_days_set))
+    if sorted_days:
+        streak = 1
+        max_streak = 1
+        for i in range(1, len(sorted_days)):
+            d1 = datetime.strptime(sorted_days[i-1], "%Y-%m-%d")
+            d2 = datetime.strptime(sorted_days[i], "%Y-%m-%d")
+            if (d2 - d1).days == 1:
+                streak += 1
+                max_streak = max(max_streak, streak)
+            else:
+                streak = 1
+
+    return {
+        "total_commits_90d": total_commits,
+        "commits_per_day": round(commits_per_day, 2),
+        "commits_per_week": round(commits_per_week, 1),
+        "active_days": active_days,
+        "consistency_score": round(consistency_score, 1),
+        "peak_hour": peak_hour,
+        "insights": insights,
+        
+        "productivity_score": round(productivity_score, 1),
+        "commit_frequency_score": round(freq_score, 1),
+        "pr_efficiency_score": round(pr_efficiency_score, 1),
+        "impact_score": round(impact_score, 1),
+        "max_streak": max_streak,
+    }
