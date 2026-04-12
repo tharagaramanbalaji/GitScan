@@ -1,163 +1,63 @@
-# 🚀 GitHub Profile Extractor with ML Analysis
+# ⚡ GitInsight Pro: Deep Developer Forensics
 
-An advanced GitHub profile analyzer that uses machine learning to extract deep technical insights from user repositories. This Streamlit application goes beyond basic profile information to understand developers' technical interests, expertise areas, and project patterns.
+**GitInsight Pro** is a high-performance, full-stack application designed to extract deep technical DNA from any GitHub profile. Using a combination of the GitHub REST & Search APIs and Machine Learning analysis, it provides professional-grade insights into a developer's true technical proficiency.
 
-## ✨ Features
+![Aesthetic Dashboard UI](https://img.shields.io/badge/UI-Aesthetic-blueviolet) ![ML Analysis](https://img.shields.io/badge/ML-Forensics-blue) ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-success) ![React](https://img.shields.io/badge/Frontend-React-61dafb)
 
-### 📊 **Basic Profile Analysis**
+## ✨ Pro Features
 
-- User information (name, bio, location, followers, etc.)
-- Repository count and activity metrics
-- Top 3 most used programming languages
-- Flexible username input (URLs, comma-separated, space-separated, or newline-separated)
-- Spelling mistake handling with fuzzy matching
+### 🔍 Deep Extraction
+- **Lifelong Stats**: Total pull requests and issues created across all public repositories.
+- **Organization Intel**: Automatic detection of professional affiliations and organizations.
+- **Recency Focus**: Live activity tracking with "Recently Pushed" repository spotlight.
+- **Social Connectivity**: Extraction of Twitter, personal websites, and location data.
 
-### 🤖 **AI-Powered Technical Analysis**
+### 🤖 ML-Powered Forensics
+- **Technical DNA Radar**: Visualizes proficiency across 7 core domains: AI/ML, Web, Mobile, DevOps, Security, Game Dev, and IoT.
+- **Precision Tech Stack**: Intelligent framework detection (e.g., Next.js, FastAPI, PyTorch) based on repository metadata and topics.
+- **Expertise Validation**: Cross-references "Bio" claims with actual repository evidence to calculate a consistency score.
+- **Stealth Skill Detection**: Identifies skills used in code that are missing from the profile bio.
 
-- **Technical Domain Classification**: Automatically identifies specialization areas
-- **TF-IDF Analysis**: Uses machine learning to extract key technologies and frameworks
-- **Project Type Detection**: Identifies patterns in project types
-- **Technical Interest Scoring**: Quantifies technical engagement (0-100 scale)
-- **Domain Expertise Validation**: Verifies claimed expertise against actual work
+### 🎨 Modern Dashboard
+- **Glassmorphism UI**: A stunning, premium interface with high-contrast slate aesthetics.
+- **Target Scanner**: An immersive loading experience with a synchronized scanner animation.
+- **Optimization Roadmap**: Actionable AI-driven tips to improve the profile's professional impact.
 
-### 🎯 **Domain Expertise Analysis**
+## 🚀 Quick Start
 
-- **Claimed vs. Verified Domains**: Compares bio claims with repository evidence
-- **Proficiency Scoring**: Detailed scoring for each technical domain
-- **Expertise Levels**:
-  - 🟢 Expert (70%+ consistency)
-  - 🟡 Intermediate (40-70% consistency)
-  - 🔴 Beginner (<40% consistency)
-- **Enhancement Suggestions**: AI-powered recommendations for profile improvement
+### 1. Backend Setup (FastAPI)
+1. Navigate to the `backend` directory.
+2. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. (Optional but Recommended) Create a `.env` file for higher rate limits:
+   ```text
+   GITHUB_TOKEN=your_personal_access_token_here
+   ```
+4. Start the server:
+   ```bash
+   python main.py
+   ```
 
-### 📈 **Supported Technical Domains**
+### 2. Frontend Setup (React + Vite)
+1. Navigate to the `frontend` directory.
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the dev server:
+   ```bash
+   npm run dev
+   ```
 
-- AI/ML & Data Science
-- Web Development
-- Mobile Development
-- DevOps & Cloud
-- Cybersecurity
-- Game Development
-- Embedded/IoT
-- And more...
-
-### 💾 **Export Options**
-
-- Individual JSON files for each user
-- Combined technical analysis results
-- Formatted CSV exports
-- Local file storage with organized structure
-
-## 🔬 How the Analysis Works
-
-### **1. Domain Expertise Validation**
-
-```python
-# Three-factor scoring for each domain
-repo_score = matching_repos / total_repos * 100       # 40% weight
-lang_score = matching_languages / expected * 100       # 30% weight
-domain_match = ML_analysis_confirmation * 100         # 30% weight
-
-final_score = (repo_score * 0.4 + lang_score * 0.3 + domain_match * 0.3)
-```
-
-### **2. Profile Consistency Check**
-
-- Analyzes bio claims against repository evidence
-- Validates programming languages and frameworks
-- Checks project types and technical domains
-- Generates improvement suggestions
-
-### **3. Technical Interest Score**
-
-```python
-interest_score = (
-    (repo_count / 50) * 30 +           # Repository activity
-    (language_diversity / 10) * 15 +    # Language diversity
-    (domain_breadth / 5) * 15 +        # Domain breadth
-    (avg_stars / 100) * 15 +           # Project impact
-    (recent_activity / 20) * 15 +      # Recent engagement
-    (follower_count / 500) * 10        # Community influence
-)
-```
-
-## 📊 Example Output
-
-```json
-{
-  "username": "developer123",
-  "name": "Jane Developer",
-  "domain_expertise": {
-    "claimed_domains": ["AI/ML", "Web Development"],
-    "verified_domains": ["Web Development", "DevOps"],
-    "consistency_scores": {
-      "AI/ML": 35.5,
-      "Web Development": 85.2,
-      "DevOps": 72.1
-    },
-    "suggestions": [
-      "Consider adding more AI/ML projects to support expertise claim",
-      "Strong DevOps work could be highlighted in bio"
-    ]
-  },
-  "technical_interest_score": 78.5
-}
-```
-
-## 🔧 Configuration
-
-### **Customizing Technical Domains**
-
-Edit the `technical_keywords` dictionary in `extract_technical_interests_ml()` to add new domains:
-
-```python
-technical_keywords = {
-    "Your New Domain": ["keyword1", "keyword2", "keyword3"],
-    # ... existing domains
-}
-```
-
-### **Adjusting TF-IDF Parameters**
-
-Modify the TfidfVectorizer parameters for different analysis sensitivity:
-
-```python
-vectorizer = TfidfVectorizer(
-    max_features=100,     # Increase for more detailed analysis
-    ngram_range=(1, 3),   # Include 3-word phrases
-    min_df=2              # Require terms to appear in multiple repos
-)
-```
-
-## 🚫 Rate Limiting
-
-- GitHub API allows 60 requests/hour for unauthenticated requests
-- For higher limits, add GitHub token authentication
-- The app processes multiple users sequentially
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m "Add amazing feature"`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+## 🛠️ Technology Stack
+- **Backend**: Python, FastAPI, Uvicorn, Scikit-learn (ML), Pandas
+- **Frontend**: React, Vite, Framer Motion (Animations), Chart.js (Radar Charts), Lucide-React (Icons)
+- **Data Acquisition**: GitHub REST API v3, GitHub Search API
 
 ## 📝 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-## 🙏 Acknowledgments
-
-- **Streamlit** for the amazing web app framework
-- **scikit-learn** for machine learning capabilities
-- **GitHub API** for providing comprehensive developer data
-- **TF-IDF algorithm** for intelligent text analysis
-
-## 📧 Contact
-
-For questions, suggestions, or issues, please open an issue on GitHub or contact the maintainer.
+This project is open-source and available under the MIT License.
 
 ---
-
-**Built with ❤️ using Python, Streamlit, and Machine Learning**
+**Built with ❤️ for the Developer Community.**

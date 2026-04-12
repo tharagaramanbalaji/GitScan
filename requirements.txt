@@ -1,6 +1,9 @@
-streamlit
+fastapi
+uvicorn
 requests
 pandas
 scikit-learn
 textblob
 numpy
+python-dotenv
+pydantic

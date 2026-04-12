@@ -93,3 +93,10 @@ coverage.xml
 secrets.json
 config.json
 credentials.json
+
+# Node modules & Frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+.eslintcache
