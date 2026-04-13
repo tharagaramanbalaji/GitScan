@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
 import ExportModal from './ExportModal';
 
-export default function ExportPanel({ dashboardId, exportConfig, setExportConfig }) {
+export default function ExportPanel({ dashboardId, exportConfig, setExportConfig, user }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -44,6 +44,7 @@ export default function ExportPanel({ dashboardId, exportConfig, setExportConfig
         dashboardId={dashboardId} 
         exportConfig={exportConfig}
         setExportConfig={setExportConfig}
+        user={user}
       />
     </>
   );

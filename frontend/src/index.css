@@ -1,16 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&family=Inter+Tight:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap');
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/geist";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --bg-color: #0f172a;
-  --card-bg: rgba(30, 41, 59, 0.7);
-  --card-border: rgba(255, 255, 255, 0.1);
+  --bg-color: #0b0f1a;
+  --card-bg: #1a1a1a;
+  --card-border: rgba(255, 255, 255, 0.05);
   --primary: #38bdf8;
   --secondary: #818cf8;
   --accent: #f472b6;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
-  --gradient-1: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-  --gradient-accent: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%);
+  --background: #0b0f1a;
+  --foreground: #f8fafc;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(15, 23, 42, 0.5);
+  --ring: #38bdf8;
+  --radius: 0.75rem;
 }
 
 * {
@@ -21,8 +32,7 @@
 
 body {
   font-family: 'Inter', sans-serif;
-  background: var(--bg-color);
-  background-image: var(--gradient-1);
+  background: #0b0f1a;
   color: var(--text-primary);
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
@@ -30,17 +40,40 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.04em;
 }
 
-.glass {
-  background: var(--card-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--card-border);
-  border-radius: 1rem;
+.hero-description {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 400;
+}
+
+.premium-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #222;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 1.1rem;
+  transition: all 0.15s ease;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: none;
+}
+
+.premium-btn:hover {
+  background: #2a2a2a;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 6px 16px rgba(0, 0, 0, 0.6);
+}
+
+.premium-btn:active {
+  background: #111;
+  transform: scale(0.98);
 }
 
 .container {
@@ -52,7 +85,7 @@ h1, h2, h3, h4 {
 button {
   cursor: pointer;
   border: none;
-  background: var(--gradient-accent);
+  background: #222;
   color: white;
   font-weight: 600;
   padding: 0.75rem 1.5rem;
@@ -89,33 +122,54 @@ input:focus, textarea:focus {
   box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
 }
 
+.glass {
+  background: #1a1a1a;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .stat-item {
   text-align: center;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 0.75rem;
-  border: 1px solid var(--card-border);
+  padding: 1.5rem;
+  background: #1a1a1a;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-value {
-  font-size: 1.5rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2.5rem;
   font-weight: 800;
-  color: var(--primary);
+  color: var(--text-primary);
   display: block;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  margin: 0.5rem 0;
 }
 
 .stat-label {
-  font-size: 0.7rem;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.1em;
+  opacity: 0.6;
 }
 
 .repo-grid {
@@ -219,4 +273,3 @@ input:focus, textarea:focus {
   height: 20px;
   border-radius: 4px;
 }
-

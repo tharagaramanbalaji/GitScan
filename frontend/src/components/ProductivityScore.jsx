@@ -5,7 +5,7 @@ export default function ProductivityScore({ metrics, stats }) {
   if (!metrics) return null;
 
   return (
-    <div style={{ marginTop: '3rem', borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '2.5rem' }}>
+    <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
           <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.5rem', color: '#fff' }}>
             <Activity size={24} color="var(--primary)" /> Developer Productivity Score

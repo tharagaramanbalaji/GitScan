@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import { X, Download, Image as ImageIcon, Eye, EyeOff } from 'lucide-react';
 
-export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig, setExportConfig }) {
+export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig, setExportConfig, user }) {
   const [isExporting, setIsExporting] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(null);
   
@@ -63,7 +63,23 @@ export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig
         backgroundColor: bgColor,
         scale: 1, // lower res for preview
         useCORS: true,
-        logging: false
+        logging: false,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById(dashboardId);
+          if (clonedElement) {
+            clonedElement.style.borderRadius = '0';
+            clonedElement.style.border = 'none';
+            clonedElement.style.boxShadow = 'none';
+            
+            const cards = clonedElement.querySelectorAll('.stat-item, .premium-card, .glass, [style*="background: #111"]');
+            cards.forEach(card => {
+              card.style.background = '#111111';
+              card.style.boxShadow = 'none';
+              card.style.backdropFilter = 'none';
+              card.style.borderTop = 'none';
+            });
+          }
+        }
       });
       setPreviewUrl(canvas.toDataURL('image/png'));
     } catch (err) {
@@ -94,17 +110,48 @@ export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig
       // High-res capture for download
       const canvas = await html2canvas(element, {
         backgroundColor: bgColor,
-        scale: 2, 
+        scale: 3, 
         useCORS: true,
-        logging: false
+        logging: false,
+        onclone: (clonedDoc) => {
+          const clonedElement = clonedDoc.getElementById(dashboardId);
+          if (clonedElement) {
+            // Remove border radius and shadows from container
+            clonedElement.style.borderRadius = '0';
+            clonedElement.style.border = 'none';
+            clonedElement.style.boxShadow = 'none';
+            
+            // Clean up all internal cards
+            const allItems = clonedElement.querySelectorAll('*');
+            allItems.forEach(item => {
+              const style = window.getComputedStyle(item);
+              if (style.boxShadow && style.boxShadow.includes('inset')) {
+                item.style.boxShadow = 'none';
+              }
+              if (style.backdropFilter !== 'none' || style.webkitBackdropFilter !== 'none') {
+                item.style.backdropFilter = 'none';
+                item.style.webkitBackdropFilter = 'none';
+              }
+            });
+
+            // Force exact solid backgrounds for key items
+            const cards = clonedElement.querySelectorAll('.stat-item, .premium-card, .glass, [style*="background: #111"]');
+            cards.forEach(card => {
+              card.style.background = '#111111';
+              card.style.backgroundColor = '#111111';
+              card.style.backgroundImage = 'none';
+              card.style.borderTop = 'none'; // Fix for the "white top line" artifact
+            });
+          }
+        }
       });
       
       const link = document.createElement('a');
-      link.download = `gitinsight-profile.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.download = `gitinsight-investigation-${user.login}.png`;
+      link.href = canvas.toDataURL('image/png', 1.0);
       link.click();
       
-      onClose(); // auto close on success
+      onClose();
     } catch (err) {
       console.error('Export failed:', err);
       alert('Failed to export image.');
