@@ -135,11 +135,16 @@ function Layout({ children }) {
           <span className="text-2xl font-bold text-white group-hover:text-primary transition-colors">GitScan</span>
         </Link>
         <div className="flex gap-10 items-center text-sm font-semibold text-gray-400">
-          <Link to="#" className="hover:text-white transition-colors no-underline">Docs</Link>
-          <a href="https://github.com/tharagaramanbalaji" target="_blank" className="hover:text-white transition-colors no-underline">Source</a>
+          <button
+            onClick={() => alert('Documentation is coming soon!')}
+            className="hover:text-white transition-colors bg-transparent border-none p-0 font-semibold cursor-pointer"
+          >
+            Docs (Coming Soon)
+          </button>
+          <a href="https://github.com/tharagaramanbalaji/GitScan" target="_blank" className="hover:text-white transition-colors no-underline">Source</a>
         </div>
         <div className="flex items-center gap-4 text-sm">
-          <a href="https://github.com/tharagaramanbalaji" target="_blank" className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all no-underline text-white font-medium flex items-center gap-2">
+          <a href="https://github.com/tharagaramanbalaji/GitScan" target="_blank" className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all no-underline text-white font-medium flex items-center gap-2">
             Github <ExternalLink size={14} />
           </a>
         </div>
@@ -148,7 +153,7 @@ function Layout({ children }) {
         {children}
       </main>
       <footer className="mt-24 pt-8 border-t border-gray-800 flex flex-col items-center gap-2 text-gray-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} GitScan. built with tharagaramanbalaji</p>
+        <p>&copy; {new Date().getFullYear()} GitScan. built by tharagaramanbalaji</p>
       </footer>
     </div>
   );
@@ -170,12 +175,12 @@ function HomePage() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex flex-col gap-6 lg:w-1/2"
         >
-          <h1 className="text-6xl lg:text-7xl font-extrabold leading-[1.1] tracking-tighter text-white">
-            Advanced ML-powered <br />
-            Developer Forensics.
+          <h1 className="text-6xl lg:text-8xl font-extrabold leading-[1.1] tracking-tighter text-white">
+            One scan<br />
+            Total developer breakdown.
           </h1>
-          <p className="hero-description text-gray-400 text-lg lg:text-xl leading-relaxed max-w-[500px]">
-            Extract deep technical DNA from any GitHub profile in seconds. Create your custom generated card instantly in our console.
+          <p className="hero-description text-gray-400 text-lg lg:text-2xl leading-relaxed max-w-[500px]">
+            Visualize skills, patterns, and performance instantly.<br /> Create your custom developer card instantly.
           </p>
           <div className="mt-4">
             <button
@@ -439,12 +444,23 @@ function ProfileDashboard({ result, index }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
                   <div>
                     <h2 style={{ fontSize: '2.25rem', marginBottom: '0.25rem', letterSpacing: '-0.02em', color: 'white' }}>{user.name || user.login}</h2>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                      <a href={user.html_url} target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                        @{user.login} <ExternalLink size={14} />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                      <a href={user.html_url} target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.4rem', lineHeight: 1 }}>
+                        <span style={{ display: 'inline-block' }}>@{user.login}</span>
+                        <ExternalLink size={14} style={{ display: 'inline-block', flexShrink: 0 }} />
                       </a>
-                      {user.location && <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Globe size={14} /> {user.location}</span>}
-                      {user.company && <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Building2 size={14} /> {user.company}</span>}
+                      {user.location && (
+                        <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', lineHeight: 1 }}>
+                          <Globe size={14} style={{ display: 'inline-block', flexShrink: 0 }} />
+                          <span style={{ display: 'inline-block' }}>{user.location}</span>
+                        </span>
+                      )}
+                      {user.company && (
+                        <span style={{ color: '#64748b', fontSize: '0.9rem', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', lineHeight: 1 }}>
+                          <Building2 size={14} style={{ display: 'inline-block', flexShrink: 0 }} />
+                          <span style={{ display: 'inline-block' }}>{user.company}</span>
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'end' }}>

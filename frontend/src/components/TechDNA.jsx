@@ -23,8 +23,9 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
   
   const RepoSection = ({ title, repos, icon: Icon, color }) => (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-      <h4 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: 'white', fontWeight: 700 }}>
-        <Icon size={20} style={{ color }} /> {title}
+      <h4 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: 'white', fontWeight: 700, lineHeight: 1 }}>
+        <Icon size={20} style={{ color, flexShrink: 0 }} /> 
+        <span>{title}</span>
       </h4>
       <div style={{ 
         display: 'grid', 
@@ -68,8 +69,9 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
           
           {config.dnaMetrics && (
             <div>
-              <h4 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: 'white', fontWeight: 700 }}>
-                <Rocket size={20} className="text-secondary" /> Developer DNA Profile
+              <h4 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: 'white', fontWeight: 700, lineHeight: 1 }}>
+                <Rocket size={20} className="text-secondary" style={{ flexShrink: 0 }} /> 
+                <span>Developer DNA Profile</span>
               </h4>
               <div style={{ background: '#111', padding: '1.75rem', borderRadius: '1rem', border: '1px solid rgba(255,255,255,0.05)', boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.05)' }}>
                 <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.15em', marginBottom: '1.5rem', fontWeight: 800 }}>
@@ -104,8 +106,9 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
 
           {config.affiliations && (organizations || []).length > 0 && (
             <div>
-              <h4 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: 'white', fontWeight: 700 }}>
-                <Building2 size={20} className="text-primary" /> Affiliations
+              <h4 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.2rem', color: 'white', fontWeight: 700, lineHeight: 1 }}>
+                <Building2 size={20} className="text-primary" style={{ flexShrink: 0 }} /> 
+                <span>Affiliations</span>
               </h4>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                 {(organizations || []).map(org => (

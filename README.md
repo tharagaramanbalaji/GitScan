@@ -1,63 +1,80 @@
-# ⚡ GitInsight Pro: Deep Developer Forensics
+# GitScan - Advanced Developer Forensics
 
-**GitInsight Pro** is a high-performance, full-stack application designed to extract deep technical DNA from any GitHub profile. Using a combination of the GitHub REST & Search APIs and Machine Learning analysis, it provides professional-grade insights into a developer's true technical proficiency.
+GitScan is a high-performance full-stack application designed to extract deep technical DNA from any GitHub profile. Using ML-powered analysis, it generates detailed technical profiles and professional dashboard images for developers.
 
-![Aesthetic Dashboard UI](https://img.shields.io/badge/UI-Aesthetic-blueviolet) ![ML Analysis](https://img.shields.io/badge/ML-Forensics-blue) ![FastAPI](https://img.shields.io/badge/Backend-FastAPI-success) ![React](https://img.shields.io/badge/Frontend-React-61dafb)
+![GitScan Dashboard Demo](https://raw.githubusercontent.com/tharagaramanbalaji/github-extract/main/frontend/public/demo.png)
 
-## ✨ Pro Features
+## 🚀 Key Features
 
-### 🔍 Deep Extraction
-- **Lifelong Stats**: Total pull requests and issues created across all public repositories.
-- **Organization Intel**: Automatic detection of professional affiliations and organizations.
-- **Recency Focus**: Live activity tracking with "Recently Pushed" repository spotlight.
-- **Social Connectivity**: Extraction of Twitter, personal websites, and location data.
+- **Deep DNA Extraction**: ML-powered analysis of repository data, coding patterns, and technical domains.
+- **Expertise Validation**: Cross-verifies claims in user biographies against actual repository contents and commitment history.
+- **Productivity Scoring**: Calculates high-fidelity metrics for commit frequency, PR efficiency, and code impact.
+- **Premium Visualization**: Interactive 3D globe visualization and sleek, dark-mode dashboard aesthetics.
+- **High-Res Export**: Modular image export system using `html-to-image` for pixel-perfect developer cards.
 
-### 🤖 ML-Powered Forensics
-- **Technical DNA Radar**: Visualizes proficiency across 7 core domains: AI/ML, Web, Mobile, DevOps, Security, Game Dev, and IoT.
-- **Precision Tech Stack**: Intelligent framework detection (e.g., Next.js, FastAPI, PyTorch) based on repository metadata and topics.
-- **Expertise Validation**: Cross-references "Bio" claims with actual repository evidence to calculate a consistency score.
-- **Stealth Skill Detection**: Identifies skills used in code that are missing from the profile bio.
+## 🛠️ Tech Stack
 
-### 🎨 Modern Dashboard
-- **Glassmorphism UI**: A stunning, premium interface with high-contrast slate aesthetics.
-- **Target Scanner**: An immersive loading experience with a synchronized scanner animation.
-- **Optimization Roadmap**: Actionable AI-driven tips to improve the profile's professional impact.
+- **Backend**: Python, FastAPI, Scikit-learn, TextBlob
+- **Frontend**: React 19, Vite, Framer Motion, Three.js (React Three Fiber)
+- **Styling**: TailwindCSS & Vanilla CSS
+- **Visualization**: Three-Globe, Chart.js
 
-## 🚀 Quick Start
+## 📦 Getting Started
 
-### 1. Backend Setup (FastAPI)
-1. Navigate to the `backend` directory.
-2. Install dependencies:
+### Prerequisites
+
+- Node.js (v18+)
+- Python (v3.10+)
+- GitHub Personal Access Token (for extended rate limits)
+
+### Installation
+
+1. **Clone the repository**:
    ```bash
+   git clone https://github.com/tharagaramanbalaji/github-extract.git
+   cd github-extract
+   ```
+
+2. **Backend Setup**:
+   ```bash
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
    pip install -r requirements.txt
    ```
-3. (Optional but Recommended) Create a `.env` file for higher rate limits:
-   ```text
-   GITHUB_TOKEN=your_personal_access_token_here
-   ```
-4. Start the server:
-   ```bash
-   python main.py
+   Create a `.env` file in the `backend` directory:
+   ```env
+   GITHUB_TOKEN=your_github_token_here
    ```
 
-### 2. Frontend Setup (React + Vite)
-1. Navigate to the `frontend` directory.
-2. Install dependencies:
+3. **Frontend Setup**:
    ```bash
+   cd ../frontend
    npm install
    ```
-3. Start the dev server:
+
+### Running Locally
+
+1. **Start Backend**:
    ```bash
+   cd backend
+   uvicorn main:app --reload
+   ```
+
+2. **Start Frontend**:
+   ```bash
+   cd frontend
    npm run dev
    ```
 
-## 🛠️ Technology Stack
-- **Backend**: Python, FastAPI, Uvicorn, Scikit-learn (ML), Pandas
-- **Frontend**: React, Vite, Framer Motion (Animations), Chart.js (Radar Charts), Lucide-React (Icons)
-- **Data Acquisition**: GitHub REST API v3, GitHub Search API
+## 🚢 Deployment
 
-## 📝 License
-This project is open-source and available under the MIT License.
+GitScan is ready for deployment as a multi-tier application:
 
----
-**Built with ❤️ for the Developer Community.**
+- **Frontend**: Deploy the `frontend` folder to Vercel or Netlify.
+- **Backend**: Deploy the `backend` folder to Render, Railway, or any Python-compatible cloud host.
+- **Config**: Ensure the frontend's `API_BASE_URL` in `App.jsx` matches your deployed backend URL.
+
+## 📄 License
+
+Built by [tharagaramanbalaji](https://github.com/tharagaramanbalaji). Distributed under the MIT License.

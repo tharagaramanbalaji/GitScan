@@ -7,8 +7,9 @@ export default function ProductivityScore({ metrics, stats }) {
   return (
     <div style={{ width: '100%' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2.5rem' }}>
-          <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.5rem', color: '#fff' }}>
-            <Activity size={24} color="var(--primary)" /> Developer Productivity Score
+          <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '1.5rem', color: '#fff', lineHeight: 1 }}>
+            <Activity size={24} style={{ color: 'var(--primary)', flexShrink: 0 }} /> 
+            <span>Developer Productivity Score</span>
           </h4>
           <div style={{ background: 'var(--primary-light)', border: '2px solid var(--primary)', padding: '0.5rem 1.5rem', borderRadius: '2rem', color: 'var(--primary)', fontWeight: 900, fontSize: '1.5rem' }}>
               {metrics.productivity_score || 0}<span style={{fontSize: '1rem', color: 'var(--primary-subdued)'}}>/100</span>
