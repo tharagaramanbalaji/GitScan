@@ -10,12 +10,8 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
   const hasLeftColumnContent = config.dnaMetrics || config.affiliations || config.activity || config.pinned;
   
   // Decide the grid depending on which columns are active
-  const gridStyle = {
-    display: 'grid',
-    gridTemplateColumns: (hasLeftColumnContent && config.dnaChart) ? '1fr 400px' : '1fr',
-    gap: '3rem',
-    alignItems: 'start'
-  };
+  const gridClass = (hasLeftColumnContent && config.dnaChart) ? 'flex flex-col lg:grid lg:grid-cols-[1fr_400px]' : 'flex flex-col';
+  const gridGap = '3rem';
 
   if (!hasLeftColumnContent && !config.dnaChart) return null;
 
@@ -29,10 +25,9 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
       </h4>
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: bothSelected ? '1fr' : 'repeat(2, 1fr)', 
         gap: '1.25rem',
         alignItems: 'stretch'
-      }}>
+      }} className={bothSelected ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}>
         {repos.map(repo => (
           <div 
             key={repo.name} 
@@ -63,7 +58,7 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
   );
 
   return (
-    <div style={gridStyle}>
+    <div className={gridClass} style={{ gap: gridGap }}>
       {hasLeftColumnContent && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem' }}>
           
@@ -124,10 +119,9 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
           {/* Dynamic Repo Grid */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: bothSelected ? '1fr 1fr' : '1fr', 
             gap: '3rem',
             alignItems: 'start'
-          }}>
+          }} className={bothSelected ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'}>
             {config.pinned && (
               <RepoSection 
                 title="Featured Works" 
@@ -151,7 +145,7 @@ export default function TechDNA({ topTechs, polarData, polarOptions, organizatio
       {config.dnaChart && (
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
           <h4 style={{ marginBottom: '2.5rem', color: '#64748b', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.2em', fontWeight: 800 }}>Domain Expertise</h4>
-          <div style={{ width: '100%', height: '350px', position: 'relative' }}>
+          <div style={{ width: '100%', position: 'relative' }} className="h-[250px] md:h-[350px]">
             <PolarArea data={polarData} options={polarOptions} />
           </div>
         </div>

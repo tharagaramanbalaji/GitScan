@@ -134,17 +134,15 @@ function Layout({ children }) {
           <GithubLogo size={28} color="#38bdf8" />
           <span className="text-2xl font-bold text-white group-hover:text-primary transition-colors">GitScan</span>
         </Link>
-        <div className="flex gap-10 items-center text-sm font-semibold text-gray-400">
+        <div className="flex gap-4 md:gap-10 items-center text-[10px] md:text-sm font-semibold text-gray-400">
           <button
             onClick={() => alert('Documentation is coming soon!')}
             className="hover:text-white transition-colors bg-transparent border-none p-0 font-semibold cursor-pointer"
           >
-            Docs (Coming Soon)
+            Docs
           </button>
           <a href="https://github.com/tharagaramanbalaji/GitScan" target="_blank" className="hover:text-white transition-colors no-underline">Source</a>
-        </div>
-        <div className="flex items-center gap-4 text-sm">
-          <a href="https://github.com/tharagaramanbalaji/GitScan" target="_blank" className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all no-underline text-white font-medium flex items-center gap-2">
+          <a href="https://github.com/tharagaramanbalaji/GitScan" target="_blank" className="hidden sm:flex px-3 py-1.5 md:px-4 md:py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all no-underline text-white font-medium items-center gap-2">
             Github <ExternalLink size={14} />
           </a>
         </div>
@@ -153,7 +151,7 @@ function Layout({ children }) {
         {children}
       </main>
       <footer className="mt-24 pt-8 border-t border-gray-800 flex flex-col items-center gap-2 text-gray-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} GitScan. built by tharagaramanbalaji</p>
+        <p>&copy; {new Date().getFullYear()} GitScan. built by <a href="https://github.com/tharagaramanbalaji" target="_blank" className="hover:text-primary transition-colors no-underline font-semibold">tharagaramanbalaji</a></p>
       </footer>
     </div>
   );
@@ -173,13 +171,24 @@ function HomePage() {
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex flex-col gap-6 lg:w-1/2"
+          className="flex flex-col gap-6 lg:w-1/2 items-center lg:items-start relative"
         >
-          <h1 className="text-6xl lg:text-8xl font-extrabold leading-[1.1] tracking-tighter text-white">
+          {/* No AI Pill */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="flex items-center gap-2 px-3 py-1 rounded-full bg-[#38bdf8]/5 border border-[#38bdf8]/20 backdrop-blur-sm mb-2"
+          >
+            <Zap size={12} className="text-[#38bdf8]" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-[#38bdf8]">No AI Slop</span>
+          </motion.div>
+
+          <h1 className="text-5xl md:text-6xl lg:text-8xl font-extrabold leading-[1.1] tracking-tighter text-white text-center lg:text-left">
             One scan<br />
             Total developer breakdown.
           </h1>
-          <p className="hero-description text-gray-400 text-lg lg:text-2xl leading-relaxed max-w-[500px]">
+          <p className="hero-description text-gray-400 text-base md:text-lg lg:text-2xl leading-relaxed max-w-[500px] text-center lg:text-left mx-auto lg:mx-0">
             Visualize skills, patterns, and performance instantly.<br /> Create your custom developer card instantly.
           </p>
           <div className="mt-4">
@@ -197,14 +206,20 @@ function HomePage() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="relative h-[450px] w-full lg:w-1/2 flex justify-center items-center overflow-hidden"
+          className="relative h-[350px] md:h-[450px] w-full lg:w-1/2 flex justify-center items-center overflow-hidden"
         >
-          <div className="absolute inset-0 z-0 scale-125">
+          <div className="absolute inset-0 z-0 scale-[1.5] md:scale-125 translate-y-10 md:translate-y-0">
             <World globeConfig={globeConfig} data={arcsData} />
           </div>
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0b0f1a] z-10 pointer-events-none"></div>
         </motion.div>
       </header>
+
+      {/* Use in PC Mention */}
+      <div className="hidden lg:flex fixed bottom-8 left-8 items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md z-40">
+        <div className="w-2 h-2 rounded-full bg-[#38bdf8] animate-pulse"></div>
+        <span className="text-xs font-semibold text-gray-400">Optimized for Desktop Investigation</span>
+      </div>
     </motion.div>
   );
 }
@@ -268,7 +283,8 @@ function ScanPage() {
             value={usernames}
             onChange={(e) => setUsernames(e.target.value)}
             rows={3}
-            style={{ marginBottom: '1.5rem', fontSize: '1.1rem', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}
+            style={{ marginBottom: '1.5rem', fontSize: '1rem', background: 'rgba(0,0,0,0.2)', border: '1px solid rgba(255,255,255,0.05)' }}
+            className="text-sm md:text-base"
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -433,19 +449,20 @@ function ProfileDashboard({ result, index }) {
         style={{ padding: '0', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', transition: 'background-color 0.2s', display: 'flex', flexDirection: 'column' }}
       >
         {exportConfig.header && (
-          <div style={{ background: 'rgba(255,255,255,0.02)', padding: '2.5rem', borderBottom: '1px solid var(--card-border)' }}>
-            <div style={{ display: 'flex', gap: '2.5rem', flexWrap: 'wrap', alignItems: 'start' }}>
+          <div style={{ background: 'rgba(255,255,255,0.02)', borderBottom: '1px solid var(--card-border)' }} className="p-6 md:p-10">
+            <div style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'start' }} className="flex-col md:flex-row">
               <motion.img
                 initial={{ scale: 0.8 }} animate={{ scale: 1 }}
                 src={user.avatar_url}
-                style={{ width: '120px', height: '120px', borderRadius: '1.5rem', border: '3px solid var(--primary)', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.2)' }}
+                style={{ borderRadius: '1.2rem', border: '3px solid var(--primary)', boxShadow: '0 10px 30px rgba(56, 189, 248, 0.2)' }}
+                className="w-16 h-16 md:w-24 md:h-24 lg:w-30 lg:h-30"
               />
-              <div style={{ flex: 1, minWidth: '300px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }}>
+              <div style={{ flex: 1, minWidth: '100%' }} className="md:min-w-[300px]">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '1rem' }} className="flex-col md:flex-row gap-4">
                   <div>
-                    <h2 style={{ fontSize: '2.25rem', marginBottom: '0.25rem', letterSpacing: '-0.02em', color: 'white' }}>{user.name || user.login}</h2>
+                    <h2 style={{ marginBottom: '0.25rem', letterSpacing: '-0.02em', color: 'white' }} className="text-2xl md:text-3xl lg:text-4xl">{user.name || user.login}</h2>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-                      <a href={user.html_url} target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.4rem', lineHeight: 1 }}>
+                      <a href={user.html_url} target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.4rem', lineHeight: 1 }} className="text-sm md:text-base">
                         <span style={{ display: 'inline-block' }}>@{user.login}</span>
                         <ExternalLink size={14} style={{ display: 'inline-block', flexShrink: 0 }} />
                       </a>
@@ -463,11 +480,11 @@ function ProfileDashboard({ result, index }) {
                       )}
                     </div>
                   </div>
-                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', alignItems: 'end' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column' }} className="items-start md:items-end md:text-right">
                     <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-                      <span style={{ fontSize: '3.75rem', fontWeight: 800, color: 'white', lineHeight: 1, fontFamily: "'Bricolage Grotesque', sans-serif", letterSpacing: '-0.05em' }}>{ml_technical_analysis.interest_score}</span>
+                      <span style={{ fontWeight: 800, color: 'white', lineHeight: 1, fontFamily: "'Bricolage Grotesque', sans-serif", letterSpacing: '-0.05em' }} className="text-4xl md:text-5xl lg:text-6xl">{ml_technical_analysis.interest_score}</span>
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: '0.25rem', fontFamily: "'Inter Tight', sans-serif", fontWeight: 800 }}>Interest Score</div>
+                    <div style={{ color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: '0.25rem', fontFamily: "'Inter Tight', sans-serif", fontWeight: 800 }} className="text-[10px] md:text-xs">Interest Score</div>
                   </div>
                 </div>
                 <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '800px' }}>
@@ -482,7 +499,7 @@ function ProfileDashboard({ result, index }) {
           </div>
         )}
 
-        <div style={{ padding: exportConfig.stats || exportConfig.dnaMetrics || exportConfig.dnaChart || exportConfig.productivity ? '2.5rem' : '0', display: 'flex', flexDirection: 'column', gap: '3rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }} className="p-6 md:p-10">
           {exportConfig.stats && (
             <div className="stats-grid">
               <div className="stat-item">

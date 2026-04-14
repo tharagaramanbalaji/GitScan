@@ -116,6 +116,30 @@ export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig
     }
   };
 
+  const handleCopy = async () => {
+    setIsExporting(true);
+    const element = document.getElementById(dashboardId);
+    if (!element) return;
+
+    try {
+      const blob = await htmlToImage.toBlob(element, {
+        backgroundColor: bgColor,
+        pixelRatio: 2,
+        cacheBust: true,
+        style: { borderRadius: '0', border: 'none', boxShadow: 'none' }
+      });
+      
+      const item = new ClipboardItem({ "image/png": blob });
+      await navigator.clipboard.write([item]);
+      alert('Image copied to clipboard!');
+    } catch (err) {
+      console.error('Copy failed:', err);
+      alert('Failed to copy image. Your browser might not support this feature.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const toggleConfig = (key) => {
     setExportConfig(prev => ({ ...prev, [key]: !prev[key] }));
   };
@@ -150,14 +174,14 @@ export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig
     }}>
       <div style={{
         background: '#1e293b', border: '1px solid rgba(255,255,255,0.1)',
-        borderRadius: '1rem', width: '90%', maxWidth: '1200px', maxHeight: '90vh',
+        borderRadius: '1rem', width: '95%', maxWidth: '1200px', maxHeight: '95vh',
         display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)'
       }}>
         
         {/* Header */}
         <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ margin: 0, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <ImageIcon size={20} className="text-primary" /> Customize Profile Export
+          <h3 style={{ margin: 0, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: '0.5rem' }} className="text-sm md:text-base">
+            <ImageIcon size={20} className="text-primary" /> <span className="hidden md:inline">Customize Profile Export</span><span className="md:hidden">Quick Export</span>
           </h3>
           <button onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex' }}>
             <X size={20} />
@@ -165,16 +189,36 @@ export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig
         </div>
 
         {/* Body Container */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(200px, 1fr) 280px', flex: 1, minHeight: '400px', overflow: 'hidden' }}>
+        <div style={{ flex: 1, minHeight: '300px', overflow: 'hidden' }} className="flex flex-col md:grid md:grid-cols-[1fr_280px]">
           
           {/* Preview Area */}
-          <div style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#0f172a', overflow: 'auto' }}>
+          <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#0f172a', overflow: 'auto' }}>
             {previewUrl ? (
-              <img 
-                src={previewUrl} 
-                alt="Export preview" 
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }} 
-              />
+              <>
+                <img 
+                  src={previewUrl} 
+                  alt="Export preview" 
+                  style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', borderRadius: '0.5rem', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 10px 25px rgba(0,0,0,0.5)' }} 
+                />
+                
+                {/* Mobile Quick Actions */}
+                <div className="md:hidden flex flex-col gap-3 w-full mt-8">
+                  <button 
+                    onClick={handleDownload}
+                    disabled={isExporting}
+                    className="w-full flex items-center justify-center gap-2 bg-primary text-slate-900 font-bold py-3 rounded-lg"
+                  >
+                    <Download size={18} /> Download Image
+                  </button>
+                  <button 
+                    onClick={handleCopy}
+                    disabled={isExporting}
+                    className="w-full flex items-center justify-center gap-2 bg-white/10 text-white font-bold py-3 rounded-lg border border-white/10"
+                  >
+                    <ImageIcon size={18} /> Copy Image
+                  </button>
+                </div>
+              </>
             ) : (
               <div style={{ color: '#64748b', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
                 <ImageIcon size={32} opacity={0.5} />
@@ -183,8 +227,8 @@ export default function ExportModal({ isOpen, onClose, dashboardId, exportConfig
             )}
           </div>
 
-          {/* Sidebar Controls */}
-          <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderLeft: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '1.5rem', overflowY: 'auto' }}>
+          {/* Sidebar Controls - Desktop Only */}
+          <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.02)', borderLeft: '1px solid rgba(255,255,255,0.05)', display: 'flex', flexDirection: 'column', gap: '1.5rem', overflowY: 'auto' }} className="hidden md:flex">
             
             <div>
               <label style={{ fontSize: '0.75rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '0.75rem', display: 'block' }}>Visible Sections</label>

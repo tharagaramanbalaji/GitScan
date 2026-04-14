@@ -82,6 +82,12 @@ h1, h2, h3, h4 {
   padding: 2rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+}
+
 button {
   cursor: pointer;
   border: none;
@@ -160,6 +166,12 @@ input:focus, textarea:focus {
   letter-spacing: -0.05em;
   line-height: 1;
   margin: 0.5rem 0;
+}
+
+@media (max-width: 768px) {
+  .stat-value {
+    font-size: 1.75rem;
+  }
 }
 
 .stat-label {
@@ -255,6 +267,16 @@ input:focus, textarea:focus {
   letter-spacing: 0.1em;
   color: var(--primary);
   text-transform: uppercase;
+}
+
+@media (max-width: 640px) {
+  .scanner-box {
+    width: 240px;
+    height: 160px;
+  }
+  .scanner-text {
+    font-size: 1.1rem;
+  }
 }
 
 .org-badge {
