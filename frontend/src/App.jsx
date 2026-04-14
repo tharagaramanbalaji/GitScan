@@ -124,7 +124,7 @@ const getTechDetails = (techName) => {
   return { class: 'devicon-github-original', color: '#cbd5e1', category: 'Other', name: techName };
 };
 
-const API_BASE_URL = 'https://gitscan.onrender.com/';
+const API_BASE_URL = 'https://gitscan.onrender.com';
 
 function Layout({ children }) {
   return (
