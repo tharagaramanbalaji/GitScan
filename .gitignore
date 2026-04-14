@@ -35,8 +35,6 @@ ENV/
 
 # Data exports (generated files)
 github_data_exports/
-*.json
-*.csv
 
 # IDE
 .vscode/
