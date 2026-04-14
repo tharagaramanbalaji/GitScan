@@ -216,7 +216,7 @@ function HomePage() {
       </header>
 
       {/* Use in PC Mention */}
-      <div className="hidden lg:flex fixed bottom-8 left-8 items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md z-40">
+      <div className="flex fixed bottom-8 left-8 items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md z-40">
         <div className="w-2 h-2 rounded-full bg-[#38bdf8] animate-pulse"></div>
         <span className="text-xs font-semibold text-gray-400">Optimized for Desktop Investigation</span>
       </div>
