@@ -2,7 +2,7 @@
 
 GitScan is a high-performance full-stack application designed to extract deep technical DNA from any GitHub profile. Using ML-powered analysis, it generates detailed technical profiles and professional dashboard images for developers.
 
-![GitScan Dashboard Demo](https://raw.githubusercontent.com/tharagaramanbalaji/github-extract/main/frontend/public/demo.png)
+
 
 ## 🚀 Key Features
 
