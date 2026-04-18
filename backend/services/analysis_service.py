@@ -1,6 +1,5 @@
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
-import numpy as np
 from datetime import datetime, timedelta
 
 def extract_top_languages(repos):
@@ -24,8 +23,7 @@ def extract_technical_interests_ml(repos, user_data=None):
             "primary_languages": [],
             "technical_domains": [],
             "project_types": [],
-            "frameworks_tech": [],
-            "interest_score": 0
+            "frameworks_tech": []
         }
     
     repo_texts = []
@@ -148,30 +146,11 @@ def extract_technical_interests_ml(repos, user_data=None):
     if any('library' in text.lower() or 'package' in text.lower() for text in repo_texts):
         project_types.append('Libraries & Packages')
 
-    # Scoring (Normalized to 100)
-    repo_score = min(len(repos) / 30, 1) * 20
-    lang_score = min(len(set(languages)) / 8, 1) * 10
-    domain_score = min(len(technical_domains) / 4, 1) * 15
-    star_score = min(np.mean(repo_stars) / 50, 1) * 15 if repo_stars else 0
-    activity_score = min(recent_activity / 15, 1) * 15
-    
-    # Extra community impact (if user_data provided)
-    community_score = 0
-    if user_data:
-        followers = user_data.get('followers', 0)
-        public_repos = user_data.get('public_repos', 0)
-        community_score += min(followers / 200, 1) * 15
-        community_score += min(public_repos / 50, 1) * 10
-
-    interest_score = repo_score + lang_score + domain_score + star_score + activity_score + community_score
-    interest_score = round(min(interest_score, 100), 2)
-
     return {
         "primary_languages": primary_languages,
         "technical_domains": technical_domains,
         "project_types": project_types,
-        "frameworks_tech": frameworks_tech,
-        "interest_score": interest_score
+        "frameworks_tech": frameworks_tech
     }
 
 def validate_domain_consistency(bio: str, repos: list, ml_analysis: dict) -> dict:

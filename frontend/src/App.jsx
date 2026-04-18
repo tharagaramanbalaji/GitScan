@@ -150,8 +150,12 @@ function Layout({ children }) {
       <main className="flex-grow">
         {children}
       </main>
-      <footer className="mt-24 pt-8 border-t border-gray-800 flex flex-col items-center gap-2 text-gray-500 text-sm">
-        <p>&copy; {new Date().getFullYear()} GitScan. built by <a href="https://github.com/tharagaramanbalaji" target="_blank" className="hover:text-primary transition-colors no-underline font-semibold">tharagaramanbalaji</a></p>
+      <footer className="mt-24 pt-8 border-t border-gray-800 flex items-center justify-between gap-2 text-gray-500 text-sm">
+        <p>© {new Date().getFullYear()} GitScan. built by <a href="https://github.com/tharagaramanbalaji" target="_blank" className="hover:text-primary transition-colors no-underline font-semibold">tharagaramanbalaji</a></p>
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-white/5 border border-white/10 rounded-full">
+          <div className="w-1.5 h-1.5 rounded-full bg-[#38bdf8] animate-pulse"></div>
+          <span className="text-xs font-semibold">Optimized for Desktop</span>
+        </div>
       </footer>
     </div>
   );
@@ -215,11 +219,6 @@ function HomePage() {
         </motion.div>
       </header>
 
-      {/* Use in PC Mention */}
-      <div className="flex fixed bottom-8 left-8 items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 rounded-full backdrop-blur-md z-40">
-        <div className="w-2 h-2 rounded-full bg-[#38bdf8] animate-pulse"></div>
-        <span className="text-xs font-semibold text-gray-400">Optimized for Desktop Investigation</span>
-      </div>
     </motion.div>
   );
 }
@@ -229,7 +228,6 @@ function ScanPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [errors, setErrors] = useState([]);
-  const [rateLimit, setRateLimit] = useState(null);
 
   const handleAnalyze = async () => {
     if (!usernames.trim()) return;
@@ -239,8 +237,6 @@ function ScanPage() {
       const response = await axios.post(`${API_BASE_URL}/analyze`, { usernames });
       setResults(response.data.results);
       setErrors(response.data.errors);
-      const rlResponse = await axios.get(`${API_BASE_URL}/rate-limit`);
-      setRateLimit(rlResponse.data);
     } catch (err) {
       console.error(err);
       setErrors(['Failed to connect to backend server. Make sure the FastAPI server is running.']);
@@ -268,7 +264,7 @@ function ScanPage() {
             <div className="scanner-box">
               <div className="scanner-line"></div>
             </div>
-            <div className="scanner-text">Scanning Target Presence...</div>
+            <div className="scanner-text">Searching up profile...</div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -287,10 +283,7 @@ function ScanPage() {
             className="text-sm md:text-base"
           />
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ color: '#64748b', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Zap size={14} />
-              {rateLimit ? `API Credits Remaining: ${rateLimit.remaining}` : 'Ready for extraction'}
-            </div>
+<div />
             <button
               onClick={handleAnalyze}
               disabled={loading || !usernames.trim()}
@@ -480,12 +473,7 @@ function ProfileDashboard({ result, index }) {
                       )}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column' }} className="items-start md:items-end md:text-right">
-                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.25rem' }}>
-                      <span style={{ fontWeight: 800, color: 'white', lineHeight: 1, fontFamily: "'Bricolage Grotesque', sans-serif", letterSpacing: '-0.05em' }} className="text-4xl md:text-5xl lg:text-6xl">{ml_technical_analysis.interest_score}</span>
-                    </div>
-                    <div style={{ color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.15em', marginTop: '0.25rem', fontFamily: "'Inter Tight', sans-serif", fontWeight: 800 }} className="text-[10px] md:text-xs">Interest Score</div>
-                  </div>
+
                 </div>
                 <p style={{ color: '#94a3b8', fontSize: '1.05rem', lineHeight: 1.6, maxWidth: '800px' }}>
                   {user.bio || 'This investigator maintains a low profile with no biography.'}
